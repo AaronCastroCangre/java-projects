@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+        INFORMACIÓN DEL PROYECTO
+        ========================
+        Estos son los datos que identifican a tu proyecto Maven.
+        - groupId: El paquete base de tu organización/proyecto
+        - artifactId: El nombre de tu proyecto
+        - version: La versión actual (SNAPSHOT significa "en desarrollo")
+    -->
+    <groupId>com.example</groupId>
+    <artifactId>todo-list-api</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>Todo List API</name>
+    <description>API REST para gestión de tareas - Proyecto para principiantes</description>
+
+    <!--
+        SPRING BOOT PARENT
+        ==================
+        Este "parent" nos proporciona configuraciones predeterminadas de Spring Boot.
+        Incluye versiones compatibles de todas las dependencias.
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.1</version>
+        <relativePath/>
+    </parent>
+
+    <!--
+        PROPIEDADES
+        ===========
+        Aquí definimos variables que usaremos en el proyecto.
+        java.version indica qué versión de Java usaremos.
+    -->
+    <properties>
+        <java.version>17</java.version>
+    </properties>
+
+    <!--
+        DEPENDENCIAS
+        ============
+        Las librerías que necesita nuestro proyecto.
+        Spring Boot facilita esto con los "starters" que agrupan dependencias comunes.
+    -->
+    <dependencies>
+
+        <!--
+            Spring Boot Web Starter
+            Incluye todo lo necesario para crear APIs REST:
+            - Spring MVC
+            - Tomcat embebido
+            - Jackson para JSON
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!--
+            Spring Boot Data JPA Starter
+            Para trabajar con bases de datos usando JPA/Hibernate:
+            - Spring Data JPA (repositorios simplificados)
+            - Hibernate (ORM que traduce objetos Java a tablas SQL)
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!--
+            Spring Boot Validation Starter
+            Para validar datos de entrada usando anotaciones:
+            - @NotBlank, @Size, @Email, etc.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!--
+            Driver de PostgreSQL
+            Permite a Java conectarse a bases de datos PostgreSQL.
+            'runtime' significa que solo se necesita al ejecutar, no al compilar.
+        -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!--
+            Flyway
+            Herramienta para gestionar migraciones de base de datos.
+            Permite versionar los cambios en la estructura de la BD.
+        -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+            <version>10.4.1</version>
+        </dependency>
+
+        <!--
+            Lombok (Opcional pero muy útil)
+            Reduce código repetitivo generando automáticamente:
+            - Getters y Setters
+            - Constructores
+            - toString(), equals(), hashCode()
+        -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!--
+            Spring Boot DevTools
+            Herramientas de desarrollo:
+            - Reinicio automático al cambiar código
+            - Configuraciones de desarrollo
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <!--
+            Dependencias de Testing
+            Para escribir y ejecutar pruebas unitarias e integración.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!--
+            H2 Database
+            Base de datos en memoria para pruebas.
+        -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!--
+            SpringDoc OpenAPI (Swagger)
+            ============================
+            Genera documentación interactiva de la API automáticamente.
+            - Swagger UI: Interfaz web para probar endpoints
+            - OpenAPI 3.0: Especificación estándar de APIs
+
+            Una vez ejecutada la app, accede a:
+            - Swagger UI: http://localhost:8080/swagger-ui.html
+            - OpenAPI JSON: http://localhost:8080/v3/api-docs
+        -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+
+    </dependencies>
+
+    <!--
+        PLUGINS DE BUILD
+        ================
+        Configuran cómo se compila y empaqueta el proyecto.
+    -->
+    <build>
+        <plugins>
+            <!--
+                Spring Boot Maven Plugin
+                Permite empaquetar la aplicación como JAR ejecutable
+                y proporciona comandos útiles como: mvn spring-boot:run
+            -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

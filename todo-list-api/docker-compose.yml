@@ -1,0 +1,79 @@
+# =============================================================================
+# DOCKER COMPOSE - TODO LIST API
+# =============================================================================
+# Este archivo define los servicios necesarios para ejecutar la aplicación.
+# Por ahora solo incluye PostgreSQL como base de datos.
+#
+# COMANDOS ÚTILES:
+# ----------------
+# Iniciar:    docker-compose up -d
+# Detener:    docker-compose down
+# Ver logs:   docker-compose logs -f postgres
+# Reiniciar:  docker-compose restart
+# Eliminar todo (incluyendo volúmenes): docker-compose down -v
+# =============================================================================
+
+version: '3.8'
+
+# Nombre del proyecto/grupo de contenedores
+name: todo-list-api
+
+services:
+  # ---------------------------------------------------------------------------
+  # POSTGRESQL
+  # ---------------------------------------------------------------------------
+  # Base de datos relacional para almacenar las tareas.
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: todolist-postgres
+    restart: unless-stopped
+
+    # Variables de entorno para configurar PostgreSQL
+    environment:
+      # Nombre de la base de datos (se crea automáticamente)
+      POSTGRES_DB: todolist_db
+      # Usuario administrador
+      POSTGRES_USER: postgres
+      # Contraseña (en producción usar secrets)
+      POSTGRES_PASSWORD: postgres
+
+    # Mapeo de puertos: HOST:CONTAINER
+    ports:
+      - "5432:5432"
+
+    # Volumen para persistir los datos
+    # Sin esto, los datos se perderían al eliminar el contenedor
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    # Healthcheck para verificar que PostgreSQL está listo
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d todolist_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+    # Configuración de red
+    networks:
+      - todolist-network
+
+# -----------------------------------------------------------------------------
+# VOLÚMENES
+# -----------------------------------------------------------------------------
+# Los volúmenes persisten datos fuera del ciclo de vida del contenedor.
+# -----------------------------------------------------------------------------
+volumes:
+  postgres_data:
+    name: todolist-postgres-data
+
+# -----------------------------------------------------------------------------
+# REDES
+# -----------------------------------------------------------------------------
+# Red personalizada para comunicación entre contenedores.
+# -----------------------------------------------------------------------------
+networks:
+  todolist-network:
+    name: todolist-network
+    driver: bridge

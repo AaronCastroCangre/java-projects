@@ -1,0 +1,223 @@
+# =============================================================================
+# CONFIGURACIÓN DE LA APLICACIÓN TODO LIST API
+# =============================================================================
+# Este archivo configura todos los aspectos de nuestra aplicación Spring Boot.
+# YAML es un formato legible que usa indentación para organizar la configuración.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# CONFIGURACIÓN DEL SERVIDOR
+# -----------------------------------------------------------------------------
+server:
+  # Puerto donde escuchará la aplicación (por defecto Spring usa 8080)
+  port: 8080
+
+  # Configuración de errores
+  error:
+    # No incluir el mensaje de error en respuestas (por seguridad)
+    include-message: never
+    # No incluir el stack trace en respuestas
+    include-stacktrace: never
+
+# -----------------------------------------------------------------------------
+# CONFIGURACIÓN DE SPRING
+# -----------------------------------------------------------------------------
+spring:
+  # Nombre de la aplicación
+  application:
+    name: todo-list-api
+
+  # -------------------------------------------------------------------------
+  # CONFIGURACIÓN DE BASE DE DATOS (PostgreSQL)
+  # -------------------------------------------------------------------------
+  datasource:
+    # URL de conexión JDBC
+    # Formato: jdbc:postgresql://[host]:[puerto]/[nombre_base_datos]
+    # IMPORTANTE: Cambia estos valores según tu configuración local
+    url: jdbc:postgresql://localhost:5432/todolist_db
+
+    # Credenciales de la base de datos
+    # NOTA: En producción, usa variables de entorno para no exponer credenciales
+    username: postgres
+    password: postgres
+
+    # Driver de PostgreSQL (Spring Boot lo detecta automáticamente, pero lo dejamos explícito)
+    driver-class-name: org.postgresql.Driver
+
+    # Pool de conexiones HikariCP (incluido por defecto en Spring Boot)
+    hikari:
+      # Número máximo de conexiones en el pool
+      maximum-pool-size: 10
+      # Tiempo máximo de espera para obtener una conexión (30 segundos)
+      connection-timeout: 30000
+
+  # -------------------------------------------------------------------------
+  # CONFIGURACIÓN DE JPA/HIBERNATE
+  # -------------------------------------------------------------------------
+  jpa:
+    # Mostrar las consultas SQL en la consola (útil para desarrollo)
+    show-sql: true
+
+    # Propiedades específicas de Hibernate
+    properties:
+      hibernate:
+        # Formatear las consultas SQL para que sean más legibles
+        format_sql: true
+        # Dialecto de PostgreSQL (ayuda a Hibernate a generar SQL óptimo)
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+    # Modo de creación del esquema de base de datos
+    # 'validate': Solo verifica que las tablas coincidan con las entidades
+    # (Usamos Flyway para crear las tablas, no Hibernate)
+    hibernate:
+      ddl-auto: validate
+
+    # Diferir la inicialización del DataSource hasta que sea necesario
+    defer-datasource-initialization: false
+
+  # -------------------------------------------------------------------------
+  # CONFIGURACIÓN DE FLYWAY (Migraciones de Base de Datos)
+  # -------------------------------------------------------------------------
+  flyway:
+    # Habilitar Flyway
+    enabled: true
+    # Ubicación de los archivos de migración
+    locations: classpath:db/migration
+    # Nombre de la tabla donde Flyway guarda el historial de migraciones
+    table: flyway_schema_history
+    # Crear el esquema si no existe
+    baseline-on-migrate: true
+
+  # -------------------------------------------------------------------------
+  # CONFIGURACIÓN DE JACKSON (Serialización JSON)
+  # -------------------------------------------------------------------------
+  jackson:
+    # Formato de fechas ISO-8601
+    date-format: com.fasterxml.jackson.databind.util.ISO8601DateFormat
+    # Zona horaria por defecto
+    time-zone: UTC
+    # No incluir propiedades con valor null en las respuestas JSON
+    default-property-inclusion: non_null
+    serialization:
+      # No fallar si no hay propiedades para serializar
+      fail-on-empty-beans: false
+      # Escribir fechas como strings ISO, no como timestamps numéricos
+      write-dates-as-timestamps: false
+
+# -----------------------------------------------------------------------------
+# CONFIGURACIÓN DE SPRINGDOC/SWAGGER
+# -----------------------------------------------------------------------------
+# SpringDoc genera automáticamente documentación OpenAPI 3.0 de nuestra API.
+# Swagger UI nos permite probar los endpoints desde el navegador.
+#
+# URLs disponibles:
+# - Swagger UI: http://localhost:8080/swagger-ui.html
+# - OpenAPI JSON: http://localhost:8080/v3/api-docs
+# - OpenAPI YAML: http://localhost:8080/v3/api-docs.yaml
+# -----------------------------------------------------------------------------
+springdoc:
+  # Configuración de la especificación OpenAPI
+  api-docs:
+    # Habilitar la generación de documentación
+    enabled: true
+    # Ruta donde se expone el JSON de OpenAPI
+    path: /v3/api-docs
+
+  # Configuración de Swagger UI
+  swagger-ui:
+    # Habilitar Swagger UI
+    enabled: true
+    # Ruta de Swagger UI
+    path: /swagger-ui.html
+    # Ordenar operaciones alfabéticamente
+    operations-sorter: alpha
+    # Ordenar tags alfabéticamente
+    tags-sorter: alpha
+    # Expandir las operaciones por defecto (none, list, full)
+    doc-expansion: list
+    # Mostrar la duración de las peticiones
+    display-request-duration: true
+    # Filtro de búsqueda habilitado
+    filter: true
+
+  # Mostrar el actuator en la documentación (si lo tuviéramos)
+  show-actuator: false
+
+  # Paquetes a escanear para generar documentación
+  packages-to-scan: com.example.todolist.controller
+
+  # Rutas a incluir en la documentación
+  paths-to-match: /api/**
+
+# -----------------------------------------------------------------------------
+# CONFIGURACIÓN DE LOGGING
+# -----------------------------------------------------------------------------
+logging:
+  level:
+    # Nivel de log general
+    root: INFO
+    # Logs de nuestra aplicación (nivel DEBUG para desarrollo)
+    com.example.todolist: DEBUG
+    # Ver las consultas SQL de Hibernate (DEBUG muestra los valores de parámetros)
+    org.hibernate.SQL: DEBUG
+    # Ver los valores de los parámetros en las consultas (TRACE es muy verboso)
+    # org.hibernate.type.descriptor.sql: TRACE
+
+  # Patrón de formato para los logs en consola
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# =============================================================================
+# PERFILES DE CONFIGURACIÓN
+# =============================================================================
+# Puedes crear archivos adicionales como:
+# - application-dev.yml (para desarrollo)
+# - application-prod.yml (para producción)
+# Y activarlos con: spring.profiles.active=dev
+#
+# Ejemplo para activar perfil:
+# spring:
+#   profiles:
+#     active: dev
+# =============================================================================
+
+---
+# =============================================================================
+# PERFIL DE DESARROLLO (dev)
+# =============================================================================
+# Para activar este perfil, ejecuta la aplicación con:
+# java -jar app.jar --spring.profiles.active=dev
+# O configura la variable de entorno: SPRING_PROFILES_ACTIVE=dev
+# =============================================================================
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+logging:
+  level:
+    com.example.todolist: DEBUG
+    org.hibernate.SQL: DEBUG
+
+---
+# =============================================================================
+# PERFIL DE PRODUCCIÓN (prod)
+# =============================================================================
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  jpa:
+    show-sql: false
+
+logging:
+  level:
+    root: WARN
+    com.example.todolist: INFO
